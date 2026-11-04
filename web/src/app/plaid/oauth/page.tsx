@@ -36,9 +36,9 @@ function PlaidOAuthResume({
         onFail(e instanceof Error ? e.message : "Failed to save linked account");
       }
     },
-    onExit: (exit) => {
-      if (exit.error) {
-        onFail(exit.error.display_message || exit.error.error_message || "Plaid closed");
+    onExit: (error) => {
+      if (error) {
+        onFail(error.display_message || error.error_message || "Plaid closed");
       } else {
         onFail("Bank linking was cancelled");
       }

@@ -47,9 +47,9 @@ function PlaidLinkOpener({
         onClose();
       }
     },
-    onExit: (exit) => {
-      if (exit.error) {
-        onFail(exit.error.display_message || exit.error.error_message || "Plaid closed");
+    onExit: (error) => {
+      if (error) {
+        onFail(error.display_message || error.error_message || "Plaid closed");
       }
       onClose();
     },

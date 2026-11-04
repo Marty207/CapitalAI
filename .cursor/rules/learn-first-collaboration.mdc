@@ -1,0 +1,35 @@
+---
+description: Teach while coding — comments, recaps, and small learner tasks
+alwaysApply: true
+---
+
+# Learn-first collaboration (CapitalAI)
+
+When changing code in this repo:
+
+## Comments in code
+- Add clear, simple comments on new or touched logic (not on every line).
+- Explain **what** the block does, **why** it exists, and **who calls it** (browser, API, DB).
+- Prefer plain language over jargon; define terms once when first used in a file.
+
+## After every coding session, include a recap with these sections
+
+### 1. Big picture (2–3 sentences)
+What feature or bug we touched and how it fits the app (web → FastAPI → Supabase/Plaid).
+
+### 2. Files changed
+Bullet list: `path/to/file` — one line on what changed.
+
+### 3. Walkthrough (teaching)
+For each important file, point to **functions or sections** (not necessarily line numbers unless helpful) and explain:
+- **What** it does
+- **Why** we did it this way
+- **What you should see** when you run the app or API
+
+### 4. Your turn (one small task)
+One concrete thing the user can do alone to learn (read a file, change a label, run curl, check Supabase table, etc.).
+
+## Pacing
+- Prefer small, reviewable diffs.
+- Do not skip the recap even for “small” fixes.
+- If the user seems lost, pause new features and explain the current stack before adding more.

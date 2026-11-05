@@ -1,16 +1,15 @@
 "use client";
 
 /**
- * Email/password login — same Supabase project as the old mobile app.
+ * Email/password login — Supabase Auth (browser uses publishable key only).
  */
 
-import Link from "next/link";
 import { AppBrand } from "@/components/app-brand";
 import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { devCredentials, isDevAutoLogin } from "@/lib/dev-auth";
-import { btnPrimaryClass, cardClass, codeInlineClass, inputClass } from "@/lib/ui";
+import { btnPrimaryClass, cardClass, inputClass } from "@/lib/ui";
 
 export default function LoginPage() {
   const { signIn, signUp, session, loading, devAuthError } = useAuth();
@@ -30,7 +29,7 @@ export default function LoginPage() {
 
   if (!loading && session) {
     return (
-      <div className="flex min-h-screen items-center justify-center text-muted-foreground">
+      <div className="flex min-h-screen items-center justify-center text-sm text-muted-foreground">
         Redirecting…
       </div>
     );
@@ -44,7 +43,7 @@ export default function LoginPage() {
 
     const trimmed = loginId.trim();
     if (!trimmed || password.length < 4) {
-      setError("Enter username or email and a password (at least 4 characters).");
+      setError("Enter your email and a password (at least 4 characters).");
       setSubmitting(false);
       return;
     }
@@ -70,79 +69,89 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="app-gradient flex min-h-screen flex-col items-center justify-center px-4">
-      <div className={`${cardClass} w-full max-w-md p-8`}>
-        <AppBrand href="/" size="md" />
-        <p className="mt-1 text-sm text-muted-foreground">Personal finance in your browser</p>
+    <div className="app-gradient flex min-h-screen items-center justify-center px-4 py-12">
+      <div className="w-full max-w-[400px]">
+        <div className={`${cardClass} relative overflow-hidden px-8 py-9 sm:px-9 sm:py-10`}>
+          <div
+            className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/45 to-transparent"
+            aria-hidden
+          />
 
-        {isDevAutoLogin() ? (
-          <p className="mt-4 rounded-xl bg-warning-bg px-3 py-2.5 text-xs text-warning-foreground">
-            Dev auto-login: <strong>{devCredentials().login}</strong> /{" "}
-            <strong>{devCredentials().password}</strong>
-            <span className="text-muted-foreground"> (stored as {devCredentials().email})</span>
-            {devAuthError ? (
-              <>
-                <br />
-                <span className="text-danger">Supabase: {devAuthError}</span>
-              </>
+          <header className="flex flex-col items-center pb-8 pt-1 text-center">
+            <AppBrand href="/" size="md" />
+          </header>
+
+          {isDevAutoLogin() ? (
+            <p className="mb-6 rounded-xl border border-warning-bg bg-warning-bg/80 px-3 py-2.5 text-xs text-warning-foreground">
+              Dev: <strong>{devCredentials().login}</strong> / <strong>{devCredentials().password}</strong>
+              {devAuthError ? (
+                <span className="mt-1 block text-danger">Supabase: {devAuthError}</span>
+              ) : null}
+            </p>
+          ) : null}
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="space-y-4">
+              <label className="block space-y-1.5">
+                <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Email
+                </span>
+                <input
+                  type="text"
+                  autoComplete="username"
+                  placeholder="you@email.com"
+                  value={loginId}
+                  onChange={(e) => setLoginId(e.target.value)}
+                  className={`${inputClass} mt-0`}
+                />
+              </label>
+              <label className="block space-y-1.5">
+                <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Password
+                </span>
+                <input
+                  type="password"
+                  autoComplete={isSignUp ? "new-password" : "current-password"}
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className={`${inputClass} mt-0`}
+                />
+              </label>
+            </div>
+
+            {error ? (
+              <p className="rounded-lg border border-danger/30 bg-danger-bg px-3 py-2 text-sm text-danger">
+                {error}
+              </p>
             ) : null}
+            {message ? (
+              <p className="rounded-lg border border-accent/25 bg-accent-muted px-3 py-2 text-sm text-accent">
+                {message}
+              </p>
+            ) : null}
+
+            <button type="submit" disabled={submitting} className={`${btnPrimaryClass} w-full py-3`}>
+              {submitting ? "Please wait…" : isSignUp ? "Create account" : "Sign in"}
+            </button>
+          </form>
+
+          <p className="mt-6 text-center text-sm text-muted-foreground">
+            {isSignUp ? "Already have an account?" : "New here?"}{" "}
+            <button
+              type="button"
+              className="font-medium text-accent transition hover:text-accent-hover"
+              onClick={() => {
+                setIsSignUp(!isSignUp);
+                setError(null);
+                setMessage(null);
+              }}
+            >
+              {isSignUp ? "Sign in" : "Create account"}
+            </button>
           </p>
-        ) : null}
-
-        <form onSubmit={handleSubmit} className="mt-8 space-y-4">
-          <label className="block text-sm font-medium text-muted-foreground">
-            Username or email
-            <input
-              type="text"
-              autoComplete="username"
-              placeholder="devlogin"
-              value={loginId}
-              onChange={(e) => setLoginId(e.target.value)}
-              className={inputClass}
-            />
-          </label>
-          <label className="block text-sm font-medium text-muted-foreground">
-            Password
-            <input
-              type="password"
-              autoComplete={isSignUp ? "new-password" : "current-password"}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className={inputClass}
-            />
-          </label>
-
-          {error ? <p className="text-sm text-danger">{error}</p> : null}
-          {message ? <p className="text-sm text-accent">{message}</p> : null}
-
-          <button type="submit" disabled={submitting} className={`${btnPrimaryClass} w-full`}>
-            {submitting ? "Please wait…" : isSignUp ? "Create account" : "Sign in"}
-          </button>
-        </form>
-
-        <button
-          type="button"
-          className="mt-4 w-full text-sm text-muted-foreground transition hover:text-foreground"
-          onClick={() => {
-            setIsSignUp(!isSignUp);
-            setError(null);
-            setMessage(null);
-          }}
-        >
-          {isSignUp ? "Already have an account? Sign in" : "Need an account? Sign up"}
-        </button>
-
-        <p className="mt-6 text-center text-xs text-muted">
-          Backend must be running:{" "}
-          <code className={codeInlineClass}>uvicorn … --port 8000</code>
-        </p>
+        </div>
       </div>
-      <Link
-        href="/dashboard"
-        className="mt-4 text-xs text-muted transition hover:text-muted-foreground"
-      >
-        Go to dashboard (requires login)
-      </Link>
     </div>
   );
 }
